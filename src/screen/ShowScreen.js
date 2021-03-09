@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 
 import { useNavigation } from "@react-navigation/native";
 import {
@@ -14,7 +14,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 
 const ShowScreen = () => {
-  const { state, DeleteBlogPost } = useContext(Context);
+  const { state, DeleteBlogPost, fetchBlogPost } = useContext(Context);
   const Navigation = useNavigation();
 
   //headerlayout
@@ -32,10 +32,22 @@ const ShowScreen = () => {
       ),
     });
   }, [Navigation, ShowScreen]);
+
+  useEffect(() => {
+    fetchBlogPost();
+
+    const listener = Navigation.addListener("focus", () => {
+      fetchBlogPost();
+    });
+
+    return () => {
+      removeEventListener("afterprint", listener);
+    };
+  }, []);
+
   return (
     <>
       <Text style={styles.Text}>Show Screen </Text>
-      <Button onPress={() => Navigation.goBack()} title="black" />
 
       <FlatList
         data={state}
@@ -55,6 +67,7 @@ const ShowScreen = () => {
           );
         }}
       />
+      <Button onPress={() => Navigation.goBack()} title="black" />
     </>
   );
 };

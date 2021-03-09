@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { View, Text, StyleSheet, Button, FlatList } from "react-native";
+import { View, Text, StyleSheet, Button } from "react-native";
 import { Context } from "../compnents/ContextProvider/context";
 
 const CreateScreen = () => {

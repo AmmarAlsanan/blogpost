@@ -1,31 +1,29 @@
 import CreateContext from "./CreateContext";
-
-const initialState = [
-  {
-    id: "",
-    title: "",
-    context: "",
-  },
-];
+import apiJson from "../../Api/jsonServer";
 
 //create reducer
 
-const reducer = (state = initialState, action) => {
+const reducer = (state, action) => {
   switch (action.type) {
+    case "GETBLOGPOST":
+      return action.payload;
+
     case "CREATE":
       return [
         ...state,
         {
-          id: state.length + 1,
-          title: action.payload.title,
-          context: action.payload.context,
+          status: action.payload.status,
+          statusText: action.payload.statusText,
         },
       ];
     case "EDIT":
-      return state.map((blogPost) => {
-        console.log(blogPost);
-        return blogPost.id === action.payload.id ? action.payload : blogPost;
-      });
+      return [
+        ...state,
+        {
+          status: action.payload.status,
+          statusText: action.payload.statusText,
+        },
+      ];
 
     case "DELETE":
       return state.filter((blogPost) => blogPost.id !== action.payload);
@@ -35,26 +33,46 @@ const reducer = (state = initialState, action) => {
 };
 
 //create action
+const fetchBlogPost = (dispatch) => {
+  return async () => {
+    const response = await apiJson.get("/blogposts");
+
+    dispatch({ type: "GETBLOGPOST", payload: response.data });
+  };
+};
+
 const addBlogPost = (dispatch) => {
-  return (title, context) => {
-    dispatch({ type: "CREATE", payload: { title, context } });
+  return async (title, context) => {
+    const response = await apiJson.post("/blogposts", { title, context });
+    // dispatch({
+    //   type: "CREATE",
+    //   payload: { status: response.status, statusText: response.statusText },
+    // });
   };
 };
 
 const editBlogPost = (dispatch) => {
-  return (id, title, context) => {
-    dispatch({ type: "EDIT", payload: { id, title, context } });
+  return async (id, title, context) => {
+    const response = await apiJson.put(`/blogposts/${id}`, {
+      title,
+      context,
+    });
+    // dispatch({
+    //   type: "EDIT",
+    //   payload: { status: response.status, statusText: response.statusText },
+    // });
   };
 };
 
 const DeleteBlogPost = (dispatch) => {
-  return (id) => {
+  return async (id) => {
+    await apiJson.delete(`/blogposts/${id}`);
     dispatch({ type: "DELETE", payload: id });
   };
 };
 
 export const { Context, Provider } = CreateContext(
   reducer,
-  { addBlogPost, DeleteBlogPost, editBlogPost },
+  { addBlogPost, DeleteBlogPost, editBlogPost, fetchBlogPost },
   []
 );
